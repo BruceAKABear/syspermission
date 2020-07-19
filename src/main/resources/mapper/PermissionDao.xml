@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="pro.dengyi.syspermission.dao.PermissionDao">
+    <select id="queryRolePerms" resultType="pro.dengyi.syspermission.model.Permission">
+        SELECT
+            t_permission.id,
+            t_permission.`name`,
+            t_permission.type,
+            t_permission.`code`,
+            t_permission.description,
+            t_permission.pid,
+            t_permission.en_visible
+        FROM
+            t_role_permission
+            LEFT JOIN t_permission ON t_role_permission.permission_id = t_permission.id
+        WHERE
+            t_role_permission.role_id = #{roleId}
+    </select>
+</mapper>

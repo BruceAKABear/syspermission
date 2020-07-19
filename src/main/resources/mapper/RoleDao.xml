@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="pro.dengyi.syspermission.dao.RoleDao">
+    <select id="queryUserRoles" resultType="pro.dengyi.syspermission.model.Role">
+        SELECT
+            t_role.id,
+            t_role.`name`,
+            t_role.description
+        FROM
+            t_user_role
+            LEFT JOIN t_role ON t_user_role.role_id = t_role.id
+        WHERE
+            t_user_role.user_id = #{userId}
+    </select>
+</mapper>
