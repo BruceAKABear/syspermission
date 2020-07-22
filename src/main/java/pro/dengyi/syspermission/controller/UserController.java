@@ -10,6 +10,11 @@ import pro.dengyi.syspermission.service.UserService;
 
 import java.util.List;
 
+/**
+ * 用户controller
+ *
+ * @author dengy
+ */
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -21,7 +26,7 @@ public class UserController {
     /**
      * 新增和修改都使用这一个方法
      *
-     * @param vo
+     * @param vo 数据传输实体
      * @return
      */
     @PostMapping("/assignRoles")
@@ -30,6 +35,12 @@ public class UserController {
         return new BaseResponse(true, "操作成功", 200);
     }
 
+    /**
+     * 根据用户ID查询用户已经分配的角色
+     *
+     * @param userId 用户ID
+     * @return 角色集合
+     */
     @GetMapping("/queryUserRoles/{userId}")
     public SingleResponse<List<Role>> queryUserRoles(@PathVariable String userId) {
         List<Role> list = userService.queryUserRoles(userId);

@@ -12,6 +12,7 @@ public class PermissionRequestVo {
     private String id;
     private String description;
     private String name;
+    //1菜单权限2按钮权限3api权限
     private Integer type;
     private String pid;
     private String code;

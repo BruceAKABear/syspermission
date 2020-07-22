@@ -10,10 +10,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/role")
 public class RoleController {
+
     @Autowired
     private RoleService roleService;
 
-
+    /**
+     * 新增角色
+     *
+     * @param role
+     * @return
+     */
     @PostMapping("/addRole")
     public BaseResponse addRole(Role role) {
         roleService.addRole(role);
@@ -32,7 +38,11 @@ public class RoleController {
         return new SingleResponse(true, "操作成功", 200, role);
     }
 
-
+    /**
+     * 查询所有角色集合
+     *
+     * @return
+     */
     @GetMapping("/queryAll")
     public SingleResponse<List<Role>> queryAll() {
         List<Role> roles = roleService.queryAll();
