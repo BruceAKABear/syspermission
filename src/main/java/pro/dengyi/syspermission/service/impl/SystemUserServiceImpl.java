@@ -4,22 +4,31 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pro.dengyi.syspermission.common.exception.BusinessException;
+import pro.dengyi.syspermission.common.res.BaseResponseEnum;
 import pro.dengyi.syspermission.dao.RoleDao;
+import pro.dengyi.syspermission.dao.SystemUserDao;
 import pro.dengyi.syspermission.dao.UserRoleDao;
-import pro.dengyi.syspermission.model.AssignRoleRequestVo;
 import pro.dengyi.syspermission.model.Role;
+import pro.dengyi.syspermission.model.SystemUser;
 import pro.dengyi.syspermission.model.UserRole;
-import pro.dengyi.syspermission.service.UserService;
+import pro.dengyi.syspermission.model.request.AssignRoleRequestVo;
+import pro.dengyi.syspermission.model.request.LoginVo;
+import pro.dengyi.syspermission.service.SystemUserService;
+import pro.dengyi.syspermission.utils.JwtTokenUtil;
+import pro.dengyi.syspermission.utils.PasswordUtil;
 
 import java.util.List;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class SystemUserServiceImpl implements SystemUserService {
     @Autowired
     private UserRoleDao userRoleDao;
 
     @Autowired
     private RoleDao roleDao;
+    @Autowired
+    private SystemUserDao systemUserDao;
 
 
     @Override
@@ -43,5 +52,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<Role> queryUserRoles(String userId) {
         return roleDao.queryUserRoles(userId);
+    }
+
+    @Override
+    public String login(LoginVo vo) {
+        QueryWrapper<SystemUser> qr = new QueryWrapper<>();
+        qr.eq("phone_number", vo.getPhone());
+        SystemUser systemUser = systemUserDao.selectOne(qr);
+        if (systemUser == null) {
+            throw new BusinessException(BaseResponseEnum.USER_EXIST);
+        }
+        Boolean match = PasswordUtil.match(vo.getPassword(), systemUser.getPassword());
+        if (!match) {
+            throw new BusinessException(BaseResponseEnum.PHONE_PASSWORD_ERROR);
+        }
+        //生成token
+        return JwtTokenUtil.genToken(systemUser);
     }
 }

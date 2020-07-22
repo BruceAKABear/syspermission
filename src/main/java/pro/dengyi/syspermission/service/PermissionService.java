@@ -2,8 +2,8 @@ package pro.dengyi.syspermission.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import pro.dengyi.syspermission.model.Permission;
-import pro.dengyi.syspermission.model.PermissionPageQueryVo;
-import pro.dengyi.syspermission.model.PermissionRequestVo;
+import pro.dengyi.syspermission.model.request.PermissionPageQueryVo;
+import pro.dengyi.syspermission.model.request.PermissionRequestVo;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package pro.dengyi.syspermission.model;
+package pro.dengyi.syspermission.model.request;
 
 import lombok.Data;
 

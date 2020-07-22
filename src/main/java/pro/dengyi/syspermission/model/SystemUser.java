@@ -10,7 +10,7 @@ import lombok.Data;
  */
 @TableName("t_user")
 @Data
-public class User {
+public class SystemUser {
     /**
      * ID
      */
@@ -18,7 +18,7 @@ public class User {
     /**
      * 用户名称
      */
-    private String username;
+    private String phoneNumber;
     /**
      * 密码
      */

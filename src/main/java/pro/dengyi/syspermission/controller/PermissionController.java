@@ -3,7 +3,12 @@ package pro.dengyi.syspermission.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import pro.dengyi.syspermission.model.*;
+import pro.dengyi.syspermission.common.res.BaseResponse;
+import pro.dengyi.syspermission.common.res.BaseResponseEnum;
+import pro.dengyi.syspermission.model.Permission;
+import pro.dengyi.syspermission.model.SingleResponse;
+import pro.dengyi.syspermission.model.request.PermissionPageQueryVo;
+import pro.dengyi.syspermission.model.request.PermissionRequestVo;
 import pro.dengyi.syspermission.service.PermissionService;
 
 @RestController
@@ -16,13 +21,13 @@ public class PermissionController {
     @PostMapping("/addPermission")
     public BaseResponse addPermission(PermissionRequestVo vo) {
         permissionService.addPermission(vo);
-        return new BaseResponse(true, "操作成功", 200);
+        return new BaseResponse(BaseResponseEnum.SUCCESS);
     }
 
     @PutMapping("/updatePermission")
     public BaseResponse updateRole(PermissionRequestVo vo) {
         permissionService.updatePermission(vo);
-        return new BaseResponse(true, "操作成功", 200);
+        return new BaseResponse(BaseResponseEnum.SUCCESS);
     }
 
     @GetMapping("/findById/{permissionId}")
@@ -34,7 +39,7 @@ public class PermissionController {
     @DeleteMapping("/deleteById/{permissionId}")
     public BaseResponse deleteById(@PathVariable String permissionId) {
         permissionService.deleteById(permissionId);
-        return new BaseResponse(true, "操作成功", 200);
+        return new BaseResponse(BaseResponseEnum.SUCCESS);
     }
 
     @PostMapping("/pageQuery")

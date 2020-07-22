@@ -1,4 +1,4 @@
-package pro.dengyi.syspermission.model;
+package pro.dengyi.syspermission.model.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;

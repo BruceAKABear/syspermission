@@ -13,6 +13,8 @@ import pro.dengyi.syspermission.dao.PermissionButtonDao;
 import pro.dengyi.syspermission.dao.PermissionDao;
 import pro.dengyi.syspermission.dao.PermissionMenuDao;
 import pro.dengyi.syspermission.model.*;
+import pro.dengyi.syspermission.model.request.PermissionPageQueryVo;
+import pro.dengyi.syspermission.model.request.PermissionRequestVo;
 import pro.dengyi.syspermission.service.PermissionService;
 
 import java.util.List;

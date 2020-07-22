@@ -2,8 +2,8 @@ package pro.dengyi.syspermission.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.springframework.stereotype.Repository;
-import pro.dengyi.syspermission.model.User;
+import pro.dengyi.syspermission.model.SystemUser;
 
 @Repository
-public interface UserDao extends BaseMapper<User> {
+public interface SystemUserDao extends BaseMapper<SystemUser> {
 }

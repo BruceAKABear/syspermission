@@ -1,6 +1,6 @@
 package pro.dengyi.syspermission.service;
 
-import pro.dengyi.syspermission.model.AssignPermissionRequestVo;
+import pro.dengyi.syspermission.model.request.AssignPermissionRequestVo;
 import pro.dengyi.syspermission.model.Permission;
 import pro.dengyi.syspermission.model.Role;
 

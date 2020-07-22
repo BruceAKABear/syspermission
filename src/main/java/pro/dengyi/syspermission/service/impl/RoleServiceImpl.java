@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import pro.dengyi.syspermission.dao.RoleDao;
 import pro.dengyi.syspermission.dao.RolePermissionDao;
-import pro.dengyi.syspermission.model.AssignPermissionRequestVo;
+import pro.dengyi.syspermission.model.request.AssignPermissionRequestVo;
 import pro.dengyi.syspermission.model.Permission;
 import pro.dengyi.syspermission.model.Role;
 import pro.dengyi.syspermission.model.RolePermission;

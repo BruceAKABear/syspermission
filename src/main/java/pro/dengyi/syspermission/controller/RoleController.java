@@ -2,7 +2,12 @@ package pro.dengyi.syspermission.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import pro.dengyi.syspermission.model.*;
+import pro.dengyi.syspermission.common.res.BaseResponse;
+import pro.dengyi.syspermission.common.res.BaseResponseEnum;
+import pro.dengyi.syspermission.model.Permission;
+import pro.dengyi.syspermission.model.Role;
+import pro.dengyi.syspermission.model.SingleResponse;
+import pro.dengyi.syspermission.model.request.AssignPermissionRequestVo;
 import pro.dengyi.syspermission.service.RoleService;
 
 import java.util.List;
@@ -23,13 +28,13 @@ public class RoleController {
     @PostMapping("/addRole")
     public BaseResponse addRole(Role role) {
         roleService.addRole(role);
-        return new BaseResponse(true, "操作成功", 200);
+        return new BaseResponse(BaseResponseEnum.SUCCESS);
     }
 
     @PutMapping("/updateRole")
     public BaseResponse updateRole(Role role) {
         roleService.updateRole(role);
-        return new BaseResponse(true, "操作成功", 200);
+        return new BaseResponse(BaseResponseEnum.SUCCESS);
     }
 
     @GetMapping("/findById/{roleId}")
@@ -53,7 +58,7 @@ public class RoleController {
     @DeleteMapping("/deleteById/{roleId}")
     public BaseResponse deleteById(@PathVariable String roleId) {
         roleService.deleteById(roleId);
-        return new BaseResponse(true, "操作成功", 200);
+        return new BaseResponse(BaseResponseEnum.SUCCESS);
 
     }
 
@@ -66,7 +71,7 @@ public class RoleController {
     @PostMapping("/assignPerms")
     public BaseResponse assignPerms(AssignPermissionRequestVo vo) {
         roleService.assignPerms(vo);
-        return new BaseResponse(true, "操作成功", 200);
+        return new BaseResponse(BaseResponseEnum.SUCCESS);
     }
 
     /**

@@ -2,11 +2,14 @@ package pro.dengyi.syspermission.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import pro.dengyi.syspermission.model.AssignRoleRequestVo;
-import pro.dengyi.syspermission.model.BaseResponse;
+import pro.dengyi.syspermission.common.res.BaseResponse;
+import pro.dengyi.syspermission.common.res.BaseResponseEnum;
+import pro.dengyi.syspermission.common.res.DataResponse;
 import pro.dengyi.syspermission.model.Role;
 import pro.dengyi.syspermission.model.SingleResponse;
-import pro.dengyi.syspermission.service.UserService;
+import pro.dengyi.syspermission.model.request.AssignRoleRequestVo;
+import pro.dengyi.syspermission.model.request.LoginVo;
+import pro.dengyi.syspermission.service.SystemUserService;
 
 import java.util.List;
 
@@ -17,10 +20,17 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/user")
-public class UserController {
+public class SystemUserController {
 
     @Autowired
-    private UserService userService;
+    private SystemUserService systemUserService;
+
+
+    @PostMapping("/login")
+    public DataResponse<String> login(@RequestBody LoginVo vo) {
+        String token = systemUserService.login(vo);
+        return new DataResponse(BaseResponseEnum.SUCCESS, token);
+    }
 
 
     /**
@@ -31,8 +41,8 @@ public class UserController {
      */
     @PostMapping("/assignRoles")
     public BaseResponse assignRoles(AssignRoleRequestVo vo) {
-        userService.assignRoles(vo);
-        return new BaseResponse(true, "操作成功", 200);
+        systemUserService.assignRoles(vo);
+        return new BaseResponse(BaseResponseEnum.SUCCESS);
     }
 
     /**
@@ -43,7 +53,7 @@ public class UserController {
      */
     @GetMapping("/queryUserRoles/{userId}")
     public SingleResponse<List<Role>> queryUserRoles(@PathVariable String userId) {
-        List<Role> list = userService.queryUserRoles(userId);
+        List<Role> list = systemUserService.queryUserRoles(userId);
         return new SingleResponse(true, "操作成功", 200, list);
     }
 
