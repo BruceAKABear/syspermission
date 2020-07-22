@@ -12,7 +12,7 @@
     <artifactId>syspermission</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>syspermission</name>
-    <description>Demo project for Spring Boot</description>
+    <description>最小权限系统测试系统</description>
 
     <properties>
         <java.version>1.8</java.version>
