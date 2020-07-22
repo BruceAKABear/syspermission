@@ -2,9 +2,11 @@ package pro.dengyi.syspermission;
 
 
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import pro.dengyi.syspermission.common.exception.BusinessException;
+import pro.dengyi.syspermission.common.res.BaseResponseEnum;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,13 +32,11 @@ public class LoginIntercepter extends HandlerInterceptorAdapter {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         if (handler instanceof HandlerMethod) {
+            String token = request.getHeader("token");
+            if (StringUtils.isEmpty(token)) {
+                throw new BusinessException(BaseResponseEnum.NEED_LOGIN);
+            }
             HandlerMethod hm = (HandlerMethod) handler;
-            RequestMapping annotation = hm.getClass().getAnnotation(RequestMapping.class);
-            System.err.println(annotation);
-            RequestMapping methodAnnotation = hm.getMethodAnnotation(RequestMapping.class);
-            System.err.println(methodAnnotation);
-            System.err.println(request.getRequestURL().toString());
-//            System.err.println(request.);
         }
         return true;
     }
