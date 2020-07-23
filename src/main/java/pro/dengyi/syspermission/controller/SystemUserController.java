@@ -32,6 +32,12 @@ public class SystemUserController {
         return new DataResponse(BaseResponseEnum.SUCCESS, token);
     }
 
+    @PostMapping("/getMenus")
+    public DataResponse<String> getMenus(@RequestBody LoginVo vo) {
+        String token = systemUserService.login(vo);
+        return new DataResponse(BaseResponseEnum.SUCCESS, token);
+    }
+
 
     /**
      * 新增和修改都使用这一个方法
