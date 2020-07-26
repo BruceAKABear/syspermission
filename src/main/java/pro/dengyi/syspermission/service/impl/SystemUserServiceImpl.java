@@ -1,23 +1,30 @@
 package pro.dengyi.syspermission.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pro.dengyi.syspermission.common.exception.BusinessException;
 import pro.dengyi.syspermission.common.res.BaseResponseEnum;
+import pro.dengyi.syspermission.dao.PermissionDao;
 import pro.dengyi.syspermission.dao.RoleDao;
 import pro.dengyi.syspermission.dao.SystemUserDao;
 import pro.dengyi.syspermission.dao.UserRoleDao;
+import pro.dengyi.syspermission.model.Permission;
 import pro.dengyi.syspermission.model.Role;
 import pro.dengyi.syspermission.model.SystemUser;
 import pro.dengyi.syspermission.model.UserRole;
 import pro.dengyi.syspermission.model.request.AssignRoleRequestVo;
 import pro.dengyi.syspermission.model.request.LoginVo;
+import pro.dengyi.syspermission.model.response.MenuDto;
 import pro.dengyi.syspermission.service.SystemUserService;
 import pro.dengyi.syspermission.utils.JwtTokenUtil;
 import pro.dengyi.syspermission.utils.PasswordUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,6 +36,8 @@ public class SystemUserServiceImpl implements SystemUserService {
     private RoleDao roleDao;
     @Autowired
     private SystemUserDao systemUserDao;
+    @Autowired
+    private PermissionDao permissionDao;
 
 
     @Override
@@ -68,5 +77,45 @@ public class SystemUserServiceImpl implements SystemUserService {
         }
         //生成token
         return JwtTokenUtil.genToken(systemUser);
+    }
+
+    @Override
+    public List<MenuDto> getMenus() {
+
+        List<MenuDto> menus = new ArrayList<>();
+        //获取第一级菜单
+        QueryWrapper<Permission> qr = new QueryWrapper<>();
+        qr.eq("type", 1);
+        qr.isNull("pid");
+        List<Permission> list = permissionDao.selectList(qr);
+        for (Permission permission : list) {
+            MenuDto menuDto = new MenuDto();
+            //封装dto
+            BeanUtil.copyProperties(permission, menuDto);
+
+            //查询第二级
+            QueryWrapper<Permission> qrr = new QueryWrapper<>();
+            qrr.eq("type", 1);
+            qrr.eq("pid", permission.getId());
+            List<Permission> listSub = permissionDao.selectList(qrr);
+            List<MenuDto> subMenus = new ArrayList<>();
+            for (Permission permissionSub : listSub) {
+                MenuDto menuSubDto = new MenuDto();
+                BeanUtil.copyProperties(permissionSub, menuSubDto);
+                subMenus.add(menuSubDto);
+            }
+            menuDto.setChildren(subMenus);
+            //添加进列表
+            menus.add(menuDto);
+
+        }
+        return menus;
+    }
+
+    @Override
+    public IPage<SystemUser> userPage(Integer pageNumber, Integer pageSize) {
+        QueryWrapper<SystemUser> qr = new QueryWrapper<>();
+        IPage<SystemUser> page = new Page<>(pageNumber == null ? 1 : pageNumber, pageSize == null ? 10 : pageSize);
+        return systemUserDao.selectPage(page, qr);
     }
 }

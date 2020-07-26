@@ -1,6 +1,7 @@
 package pro.dengyi.syspermission.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 /**
@@ -22,7 +23,10 @@ public class SystemUser {
     /**
      * 密码
      */
+    @JsonIgnore
     private String password;
+    private Boolean isAdmin;
+    private String nickName;
 
 
 }

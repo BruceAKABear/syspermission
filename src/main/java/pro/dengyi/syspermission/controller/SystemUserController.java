@@ -1,5 +1,6 @@
 package pro.dengyi.syspermission.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pro.dengyi.syspermission.common.res.BaseResponse;
@@ -7,8 +8,10 @@ import pro.dengyi.syspermission.common.res.BaseResponseEnum;
 import pro.dengyi.syspermission.common.res.DataResponse;
 import pro.dengyi.syspermission.model.Role;
 import pro.dengyi.syspermission.model.SingleResponse;
+import pro.dengyi.syspermission.model.SystemUser;
 import pro.dengyi.syspermission.model.request.AssignRoleRequestVo;
 import pro.dengyi.syspermission.model.request.LoginVo;
+import pro.dengyi.syspermission.model.response.MenuDto;
 import pro.dengyi.syspermission.service.SystemUserService;
 
 import java.util.List;
@@ -32,10 +35,16 @@ public class SystemUserController {
         return new DataResponse(BaseResponseEnum.SUCCESS, token);
     }
 
-    @PostMapping("/getMenus")
-    public DataResponse<String> getMenus(@RequestBody LoginVo vo) {
-        String token = systemUserService.login(vo);
-        return new DataResponse(BaseResponseEnum.SUCCESS, token);
+    @GetMapping("/getMenus")
+    public DataResponse<List<MenuDto>> getMenus() {
+        List<MenuDto> menuDtos = systemUserService.getMenus();
+        return new DataResponse(BaseResponseEnum.SUCCESS, menuDtos);
+    }
+
+    @GetMapping("/userPage/{pageNumber}/{pageSize}")
+    public DataResponse<IPage<SystemUser>> userPage(@PathVariable Integer pageNumber, @PathVariable Integer pageSize) {
+        IPage<SystemUser> pages = systemUserService.userPage(pageNumber, pageSize);
+        return new DataResponse(BaseResponseEnum.SUCCESS, pages);
     }
 
 
