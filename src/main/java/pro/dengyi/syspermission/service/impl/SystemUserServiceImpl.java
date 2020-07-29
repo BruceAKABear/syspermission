@@ -20,9 +20,11 @@ import pro.dengyi.syspermission.model.UserRole;
 import pro.dengyi.syspermission.model.request.AssignRoleRequestVo;
 import pro.dengyi.syspermission.model.request.LoginVo;
 import pro.dengyi.syspermission.model.response.MenuDto;
+import pro.dengyi.syspermission.model.response.UserInfoDto;
 import pro.dengyi.syspermission.service.SystemUserService;
 import pro.dengyi.syspermission.utils.JwtTokenUtil;
 import pro.dengyi.syspermission.utils.PasswordUtil;
+import pro.dengyi.syspermission.utils.UserHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,5 +119,17 @@ public class SystemUserServiceImpl implements SystemUserService {
         QueryWrapper<SystemUser> qr = new QueryWrapper<>();
         IPage<SystemUser> page = new Page<>(pageNumber == null ? 1 : pageNumber, pageSize == null ? 10 : pageSize);
         return systemUserDao.selectPage(page, qr);
+    }
+
+    @Override
+    public UserInfoDto userInfo() {
+        UserInfoDto userInfoDto = new UserInfoDto();
+        SystemUser systemUser = systemUserDao.selectById(UserHolder.getId());
+        userInfoDto.setUserInfo(systemUser);
+        //判断用户类型，如果是超级管理员查询所有权限
+        userInfoDto.setButtons(new ArrayList<>());
+        userInfoDto.setMenus(new ArrayList<>());
+
+        return userInfoDto;
     }
 }

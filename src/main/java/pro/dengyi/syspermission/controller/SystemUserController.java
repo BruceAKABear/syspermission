@@ -12,6 +12,7 @@ import pro.dengyi.syspermission.model.SystemUser;
 import pro.dengyi.syspermission.model.request.AssignRoleRequestVo;
 import pro.dengyi.syspermission.model.request.LoginVo;
 import pro.dengyi.syspermission.model.response.MenuDto;
+import pro.dengyi.syspermission.model.response.UserInfoDto;
 import pro.dengyi.syspermission.service.SystemUserService;
 
 import java.util.List;
@@ -70,6 +71,12 @@ public class SystemUserController {
     public SingleResponse<List<Role>> queryUserRoles(@PathVariable String userId) {
         List<Role> list = systemUserService.queryUserRoles(userId);
         return new SingleResponse(true, "操作成功", 200, list);
+    }
+
+    @GetMapping("/userInfo")
+    public SingleResponse<UserInfoDto> userInfo() {
+        UserInfoDto userInfoDto = systemUserService.userInfo();
+        return new SingleResponse(true, "操作成功", 200, userInfoDto);
     }
 
 
