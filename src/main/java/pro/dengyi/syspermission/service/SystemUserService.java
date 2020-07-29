@@ -40,4 +40,11 @@ public interface SystemUserService {
      */
     UserInfoDto userInfo();
 
+    /**
+     * 新增用户
+     *
+     * @param systemUser
+     */
+    void addUser(SystemUser systemUser);
+
 }

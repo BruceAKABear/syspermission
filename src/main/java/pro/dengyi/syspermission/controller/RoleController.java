@@ -26,7 +26,7 @@ public class RoleController {
      * @return
      */
     @PostMapping("/addRole")
-    public BaseResponse addRole(Role role) {
+    public BaseResponse addRole(@RequestBody Role role) {
         roleService.addRole(role);
         return new BaseResponse(BaseResponseEnum.SUCCESS);
     }

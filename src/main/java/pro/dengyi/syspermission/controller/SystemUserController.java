@@ -30,6 +30,12 @@ public class SystemUserController {
     private SystemUserService systemUserService;
 
 
+    @PostMapping("/addUser")
+    public BaseResponse addUser(@RequestBody SystemUser systemUser) {
+        systemUserService.addUser(systemUser);
+        return new BaseResponse(BaseResponseEnum.SUCCESS);
+    }
+
     @PostMapping("/login")
     public DataResponse<String> login(@RequestBody LoginVo vo) {
         String token = systemUserService.login(vo);

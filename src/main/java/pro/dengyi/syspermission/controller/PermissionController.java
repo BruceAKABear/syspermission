@@ -42,7 +42,7 @@ public class PermissionController {
         return new BaseResponse(BaseResponseEnum.SUCCESS);
     }
 
-    @PostMapping("/pageQuery")
+    @GetMapping("/pageQuery")
     public SingleResponse<IPage<Permission>> pageQuery(PermissionPageQueryVo vo) {
         IPage<Permission> pages = permissionService.pageQuery(vo);
         return new SingleResponse(true, "操作成功", 200, pages);

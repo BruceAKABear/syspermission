@@ -25,7 +25,11 @@ public class SystemUser {
      */
     @JsonIgnore
     private String password;
-    private Boolean isAdmin;
+    /**
+     * 是否是sass管理员
+     */
+    private Boolean isSassAdmin;
+    private Boolean isCoAdmin;
     private String nickName;
 
 

@@ -85,32 +85,70 @@ public class SystemUserServiceImpl implements SystemUserService {
     public List<MenuDto> getMenus() {
 
         List<MenuDto> menus = new ArrayList<>();
-        //获取第一级菜单
-        QueryWrapper<Permission> qr = new QueryWrapper<>();
-        qr.eq("type", 1);
-        qr.isNull("pid");
-        List<Permission> list = permissionDao.selectList(qr);
-        for (Permission permission : list) {
-            MenuDto menuDto = new MenuDto();
-            //封装dto
-            BeanUtil.copyProperties(permission, menuDto);
+        //判断用户类型
+        SystemUser systemUser = systemUserDao.selectById(UserHolder.getId());
+        if (systemUser.getIsSassAdmin()) {
+            //sass管理员查询所有
+            //获取第一级菜单
+            QueryWrapper<Permission> qr = new QueryWrapper<>();
+            qr.eq("type", 1);
+            qr.isNull("pid");
+            List<Permission> list = permissionDao.selectList(qr);
+            for (Permission permission : list) {
+                MenuDto menuDto = new MenuDto();
+                //封装dto
+                BeanUtil.copyProperties(permission, menuDto);
 
-            //查询第二级
-            QueryWrapper<Permission> qrr = new QueryWrapper<>();
-            qrr.eq("type", 1);
-            qrr.eq("pid", permission.getId());
-            List<Permission> listSub = permissionDao.selectList(qrr);
-            List<MenuDto> subMenus = new ArrayList<>();
-            for (Permission permissionSub : listSub) {
-                MenuDto menuSubDto = new MenuDto();
-                BeanUtil.copyProperties(permissionSub, menuSubDto);
-                subMenus.add(menuSubDto);
+                //查询第二级
+                QueryWrapper<Permission> qrr = new QueryWrapper<>();
+                qrr.eq("type", 1);
+                qrr.eq("pid", permission.getId());
+                List<Permission> listSub = permissionDao.selectList(qrr);
+                List<MenuDto> subMenus = new ArrayList<>();
+                for (Permission permissionSub : listSub) {
+                    MenuDto menuSubDto = new MenuDto();
+                    BeanUtil.copyProperties(permissionSub, menuSubDto);
+                    subMenus.add(menuSubDto);
+                }
+                menuDto.setChildren(subMenus);
+                //添加进列表
+                menus.add(menuDto);
+
             }
-            menuDto.setChildren(subMenus);
-            //添加进列表
-            menus.add(menuDto);
 
+        } else if (systemUser.getIsCoAdmin()) {
+            //企业管理员查询企业所有权限,同时是可见的才行
+            //获取第一级菜单
+            QueryWrapper<Permission> qr = new QueryWrapper<>();
+            qr.eq("type", 1);
+            qr.eq("en_visible", 1);
+            qr.isNull("pid");
+            List<Permission> list = permissionDao.selectList(qr);
+            for (Permission permission : list) {
+                MenuDto menuDto = new MenuDto();
+                //封装dto
+                BeanUtil.copyProperties(permission, menuDto);
+
+                //查询第二级
+                QueryWrapper<Permission> qrr = new QueryWrapper<>();
+                qrr.eq("type", 1);
+                qrr.eq("pid", permission.getId());
+                List<Permission> listSub = permissionDao.selectList(qrr);
+                List<MenuDto> subMenus = new ArrayList<>();
+                for (Permission permissionSub : listSub) {
+                    MenuDto menuSubDto = new MenuDto();
+                    BeanUtil.copyProperties(permissionSub, menuSubDto);
+                    subMenus.add(menuSubDto);
+                }
+                menuDto.setChildren(subMenus);
+                //添加进列表
+                menus.add(menuDto);
+
+            }
+        } else {
+            //普通用户更具角色查
         }
+
         return menus;
     }
 
@@ -131,5 +169,10 @@ public class SystemUserServiceImpl implements SystemUserService {
         userInfoDto.setMenus(new ArrayList<>());
 
         return userInfoDto;
+    }
+
+    @Override
+    public void addUser(SystemUser systemUser) {
+        systemUserDao.insert(systemUser);
     }
 }
