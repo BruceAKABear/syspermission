@@ -8,10 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import pro.dengyi.syspermission.dao.PermissionApiDao;
-import pro.dengyi.syspermission.dao.PermissionButtonDao;
-import pro.dengyi.syspermission.dao.PermissionDao;
-import pro.dengyi.syspermission.dao.PermissionMenuDao;
+import pro.dengyi.syspermission.common.exception.BusinessException;
+import pro.dengyi.syspermission.common.res.BaseResponseEnum;
+import pro.dengyi.syspermission.dao.*;
 import pro.dengyi.syspermission.model.*;
 import pro.dengyi.syspermission.model.request.PermissionPageQueryVo;
 import pro.dengyi.syspermission.model.request.PermissionRequestVo;
@@ -33,6 +32,10 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Autowired
     private PermissionApiDao permissionApiDao;
+
+    @Autowired
+    private RolePermissionDao rolePermissionDao;
+
 
 
     @Override
@@ -81,7 +84,6 @@ public class PermissionServiceImpl implements PermissionService {
         permissionDao.updateById(permission);
         switch (vo.getType()) {
             case 1:
-                //菜单权限
                 //封装扩展数据
                 PermissionMenu pm = new PermissionMenu();
                 BeanUtil.copyProperties(vo, pm);
@@ -132,6 +134,18 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     @Transactional
     public void deleteById(String permissionId) {
+        //权限被使用或者有子权限均不能删除
+        QueryWrapper<RolePermission>  qr= new QueryWrapper<>();
+        qr.eq("permission_id", permissionId);
+        RolePermission rolePermissionMiddle = rolePermissionDao.selectOne(qr);
+        QueryWrapper<Permission> qrr= new QueryWrapper<>();
+        qrr.eq("pid", permissionId);
+        Permission permissionSelected = permissionDao.selectOne(qrr);
+        if (rolePermissionMiddle!=null||permissionSelected!=null) {
+            //其中任意不为null均已被使用则不能删除
+            throw new BusinessException(BaseResponseEnum.FAIL);
+        }
+        //删除
         Permission permission = permissionDao.selectById(permissionId);
         permissionDao.deleteById(permission.getId());
         switch (permission.getType()) {

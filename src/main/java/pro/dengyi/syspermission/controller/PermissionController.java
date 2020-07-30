@@ -19,7 +19,7 @@ public class PermissionController {
 
 
     @PostMapping("/addPermission")
-    public BaseResponse addPermission(PermissionRequestVo vo) {
+    public BaseResponse addPermission(@RequestBody PermissionRequestVo vo) {
         permissionService.addPermission(vo);
         return new BaseResponse(BaseResponseEnum.SUCCESS);
     }
@@ -36,6 +36,12 @@ public class PermissionController {
         return new SingleResponse(true, "操作成功", 200, role);
     }
 
+    /**
+     * 根据权限ID删除权限，在删除时会判断权限是否已经被使用，被使用后不能删除
+     *
+     * @param permissionId
+     * @return
+     */
     @DeleteMapping("/deleteById/{permissionId}")
     public BaseResponse deleteById(@PathVariable String permissionId) {
         permissionService.deleteById(permissionId);

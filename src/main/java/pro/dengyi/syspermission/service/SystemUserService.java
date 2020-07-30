@@ -37,8 +37,9 @@ public interface SystemUserService {
      * 用户信息中包含1.用户个人信息2.用户菜单权限3.用户按钮权限
      *
      * @return
+     * @param userId
      */
-    UserInfoDto userInfo();
+    UserInfoDto userInfo(String userId);
 
     /**
      * 新增用户

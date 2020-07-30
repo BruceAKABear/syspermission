@@ -1,4 +1,4 @@
-package pro.dengyi.syspermission;
+package pro.dengyi.syspermission.config;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +8,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import pro.dengyi.syspermission.LoginIntercepter;
 
+/**
+ * spring mvc配置
+ *
+ * @author dengy
+ */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
@@ -20,6 +26,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginIntercepter)
                 .addPathPatterns("/**")
+                .excludePathPatterns("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**")
                 .excludePathPatterns("/user/login")
         ;
     }
@@ -38,4 +45,5 @@ public class WebMvcConfig implements WebMvcConfigurer {
             }
         };
     }
+
 }

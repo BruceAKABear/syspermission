@@ -1,6 +1,8 @@
 package pro.dengyi.syspermission.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pro.dengyi.syspermission.common.res.BaseResponse;
@@ -22,6 +24,7 @@ import java.util.List;
  *
  * @author dengy
  */
+@Api(tags = "用户接口")
 @RestController
 @RequestMapping("/user")
 public class SystemUserController {
@@ -30,24 +33,25 @@ public class SystemUserController {
     private SystemUserService systemUserService;
 
 
+    @ApiOperation("新增用户")
     @PostMapping("/addUser")
     public BaseResponse addUser(@RequestBody SystemUser systemUser) {
         systemUserService.addUser(systemUser);
         return new BaseResponse(BaseResponseEnum.SUCCESS);
     }
-
+    @ApiOperation("登录")
     @PostMapping("/login")
     public DataResponse<String> login(@RequestBody LoginVo vo) {
         String token = systemUserService.login(vo);
         return new DataResponse(BaseResponseEnum.SUCCESS, token);
     }
-
+    @ApiOperation("获取菜单")
     @GetMapping("/getMenus")
     public DataResponse<List<MenuDto>> getMenus() {
         List<MenuDto> menuDtos = systemUserService.getMenus();
         return new DataResponse(BaseResponseEnum.SUCCESS, menuDtos);
     }
-
+    @ApiOperation("用户分页查询")
     @GetMapping("/userPage/{pageNumber}/{pageSize}")
     public DataResponse<IPage<SystemUser>> userPage(@PathVariable Integer pageNumber, @PathVariable Integer pageSize) {
         IPage<SystemUser> pages = systemUserService.userPage(pageNumber, pageSize);
@@ -61,6 +65,7 @@ public class SystemUserController {
      * @param vo 数据传输实体
      * @return
      */
+    @ApiOperation("分配角色")
     @PostMapping("/assignRoles")
     public BaseResponse assignRoles(AssignRoleRequestVo vo) {
         systemUserService.assignRoles(vo);
@@ -73,15 +78,17 @@ public class SystemUserController {
      * @param userId 用户ID
      * @return 角色集合
      */
+    @ApiOperation("查询用户所有角色")
     @GetMapping("/queryUserRoles/{userId}")
     public SingleResponse<List<Role>> queryUserRoles(@PathVariable String userId) {
         List<Role> list = systemUserService.queryUserRoles(userId);
         return new SingleResponse(true, "操作成功", 200, list);
     }
 
-    @GetMapping("/userInfo")
-    public SingleResponse<UserInfoDto> userInfo() {
-        UserInfoDto userInfoDto = systemUserService.userInfo();
+    @ApiOperation("查询用户信息")
+    @GetMapping("/userInfo/{userId}")
+    public SingleResponse<UserInfoDto> userInfo(@PathVariable String userId) {
+        UserInfoDto userInfoDto = systemUserService.userInfo(userId);
         return new SingleResponse(true, "操作成功", 200, userInfoDto);
     }
 

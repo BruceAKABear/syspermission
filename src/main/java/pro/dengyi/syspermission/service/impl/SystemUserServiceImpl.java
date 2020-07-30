@@ -160,9 +160,9 @@ public class SystemUserServiceImpl implements SystemUserService {
     }
 
     @Override
-    public UserInfoDto userInfo() {
+    public UserInfoDto userInfo(String userId) {
         UserInfoDto userInfoDto = new UserInfoDto();
-        SystemUser systemUser = systemUserDao.selectById(UserHolder.getId());
+        SystemUser systemUser = systemUserDao.selectById(userId);
         userInfoDto.setUserInfo(systemUser);
         //判断用户类型，如果是超级管理员查询所有权限
         userInfoDto.setButtons(new ArrayList<>());
