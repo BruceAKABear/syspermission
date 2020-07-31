@@ -5,8 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import pro.dengyi.syspermission.common.exception.BusinessException;
-import pro.dengyi.syspermission.common.res.BaseResponseEnum;
+import pro.dengyi.syspermission.common.response.BaseResponseEnum;
 import pro.dengyi.syspermission.dao.RoleDao;
 import pro.dengyi.syspermission.dao.RolePermissionDao;
 import pro.dengyi.syspermission.dao.UserRoleDao;
@@ -36,22 +37,24 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional
-    public void addRole(Role role) {
-        roleDao.insert(role);
-    }
+    public void addUpdateRole(Role role) {
+        //查询角色名是否存在
+        QueryWrapper<Role> qr = new QueryWrapper<>();
+        qr.eq("name", role.getName());
+        Role roleSaved = roleDao.selectOne(qr);
+        if (StringUtils.isEmpty(role.getId())) {
+            //新增
+            if (roleSaved != null) {
+                throw new BusinessException(BaseResponseEnum.ROLE_EXIST);
+            }
+            roleDao.insert(role);
+        } else {
+            if (!roleSaved.getId().equals(role.getId())) {
+                throw new BusinessException(BaseResponseEnum.ROLE_EXIST);
+            }
+            roleDao.updateById(role);
+        }
 
-    @Override
-    @Transactional
-    public void updateRole(Role role) {
-        Role roleSaved = roleDao.selectById(role.getId());
-        roleSaved.setName(role.getName());
-        roleSaved.setDescription(role.getDescription());
-        roleDao.updateById(roleSaved);
-    }
-
-    @Override
-    public Role findById(String roleId) {
-        return roleDao.selectById(roleId);
     }
 
     /**
@@ -116,13 +119,9 @@ public class RoleServiceImpl implements RoleService {
 
     }
 
-    @Override
-    public List<Permission> queryRolePerms(String roleId) {
-        return permissionService.queryRolePerms(roleId);
-    }
 
     @Override
-    public List<String> queryAssignedRoles(String userId) {
+    public List<String> queryUserAssignedRoles(String userId) {
         List<String> roles = new ArrayList<>();
         QueryWrapper<UserRole> qr = new QueryWrapper<>();
         qr.eq("user_id", userId);
@@ -134,5 +133,4 @@ public class RoleServiceImpl implements RoleService {
         }
         return roles;
     }
-
 }

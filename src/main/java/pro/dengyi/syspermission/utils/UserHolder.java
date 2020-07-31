@@ -18,11 +18,20 @@ public class UserHolder {
     }
 
     /**
+     * 获取用户数据
+     *
+     * @return
+     */
+    public static SystemUser getUser() {
+        return local.get();
+    }
+
+    /**
      * 设置值
      *
      * @param systemUser 用户信息
      */
-    public static  void setUser(SystemUser systemUser) {
+    public static void setUser(SystemUser systemUser) {
         local.set(systemUser);
     }
 

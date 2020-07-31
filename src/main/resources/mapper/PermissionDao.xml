@@ -16,4 +16,42 @@
         WHERE
             t_role_permission.role_id = #{roleId}
     </select>
+    <select id="selectFirstByUserId" resultType="pro.dengyi.syspermission.model.Permission">
+       SELECT DISTINCT
+            t_permission.id,
+            t_permission.`name`,
+            t_permission.type,
+            t_permission.`code`,
+            t_permission.description,
+            t_permission.pid,
+            t_permission.en_visible,
+            t_permission.can_delete
+        FROM
+            t_permission
+            INNER JOIN t_role_permission ON t_permission.id = t_role_permission.permission_id
+            INNER JOIN t_user_role ON t_role_permission.role_id = t_user_role.role_id
+            AND t_user_role.user_id = #{userId}
+        WHERE
+            t_permission.type = 1
+            AND t_permission.pid = NULL
+    </select>
+    <select id="selectButtonsByUserId" resultType="pro.dengyi.syspermission.model.Permission">
+        SELECT DISTINCT
+            t_permission.id,
+            t_permission.`name`,
+            t_permission.type,
+            t_permission.`code`,
+            t_permission.description,
+            t_permission.pid,
+            t_permission.en_visible,
+            t_permission.can_delete
+        FROM
+            t_permission
+            INNER JOIN t_role_permission ON t_permission.id = t_role_permission.permission_id
+            INNER JOIN t_user_role ON t_role_permission.role_id = t_user_role.role_id
+            AND t_user_role.user_id = #{userId}
+        WHERE
+            t_permission.type = 2
+            AND t_permission.pid = NULL
+    </select>
 </mapper>

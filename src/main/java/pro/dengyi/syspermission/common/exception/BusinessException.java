@@ -1,7 +1,7 @@
 package pro.dengyi.syspermission.common.exception;
 
 
-import pro.dengyi.syspermission.common.res.BaseResponseEnum;
+import pro.dengyi.syspermission.common.response.BaseResponseEnum;
 
 /**
  * 业务异常类

@@ -1,6 +1,7 @@
 package pro.dengyi.syspermission.model.response;
 
 import lombok.Data;
+import pro.dengyi.syspermission.model.Permission;
 import pro.dengyi.syspermission.model.SystemUser;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class UserInfoDto {
     /**
      * 菜单树
      */
-    private List<MenuTree> menus;
+    private List<Permission> menuTree;
     /**
      * 按钮集合
      */

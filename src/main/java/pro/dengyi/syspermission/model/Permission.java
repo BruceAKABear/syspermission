@@ -1,11 +1,17 @@
 package pro.dengyi.syspermission.model;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @TableName("t_permission")
 @Data
-public class Permission  {
+public class Permission {
     /**
      * 主键
      */
@@ -36,5 +42,8 @@ public class Permission  {
 
     //可见状态0的话查询系统级别，1是企业级别
     private Boolean enVisible;
+
+    @TableField(exist = false)
+    private List<Permission> children = new ArrayList<>();
 
 }

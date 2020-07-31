@@ -1,4 +1,4 @@
-package pro.dengyi.syspermission.common.res;
+package pro.dengyi.syspermission.common.response;
 
 /**
  * 基础响应基类
@@ -12,12 +12,14 @@ public interface Response {
      * @return
      */
     Boolean getStatus();
+
     /**
      * 获取响应码
      *
      * @return
      */
     Integer getCode();
+
     /**
      * 获取响应信息
      *

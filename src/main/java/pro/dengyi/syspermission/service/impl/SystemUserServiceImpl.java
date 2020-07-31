@@ -1,6 +1,5 @@
 package pro.dengyi.syspermission.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -8,39 +7,49 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pro.dengyi.syspermission.common.exception.BusinessException;
-import pro.dengyi.syspermission.common.res.BaseResponseEnum;
-import pro.dengyi.syspermission.dao.PermissionDao;
+import pro.dengyi.syspermission.common.response.BaseResponseEnum;
 import pro.dengyi.syspermission.dao.RoleDao;
 import pro.dengyi.syspermission.dao.SystemUserDao;
 import pro.dengyi.syspermission.dao.UserRoleDao;
 import pro.dengyi.syspermission.model.Permission;
-import pro.dengyi.syspermission.model.Role;
 import pro.dengyi.syspermission.model.SystemUser;
 import pro.dengyi.syspermission.model.UserRole;
 import pro.dengyi.syspermission.model.request.AssignRoleRequestVo;
 import pro.dengyi.syspermission.model.request.LoginVo;
-import pro.dengyi.syspermission.model.response.MenuDto;
 import pro.dengyi.syspermission.model.response.UserInfoDto;
+import pro.dengyi.syspermission.model.vo.PermCondition;
+import pro.dengyi.syspermission.service.PermissionService;
 import pro.dengyi.syspermission.service.SystemUserService;
 import pro.dengyi.syspermission.utils.JwtTokenUtil;
 import pro.dengyi.syspermission.utils.PasswordUtil;
 import pro.dengyi.syspermission.utils.UserHolder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class SystemUserServiceImpl implements SystemUserService {
     @Autowired
     private UserRoleDao userRoleDao;
-
     @Autowired
     private RoleDao roleDao;
     @Autowired
     private SystemUserDao systemUserDao;
     @Autowired
-    private PermissionDao permissionDao;
+    private PermissionService permissionService;
 
+
+    @Override
+    @Transactional
+    public void addUser(SystemUser systemUser) {
+        //查询手机是否已经注册
+        QueryWrapper<SystemUser> qr = new QueryWrapper<>();
+        qr.eq("phone_number", systemUser.getPhoneNumber());
+        SystemUser systemUserSaved = systemUserDao.selectOne(qr);
+        if (systemUserSaved != null) {
+            throw new BusinessException(BaseResponseEnum.USER_EXIST);
+        }
+        systemUserDao.insert(systemUser);
+    }
 
     @Override
     @Transactional
@@ -61,95 +70,21 @@ public class SystemUserServiceImpl implements SystemUserService {
     }
 
     @Override
-    public List<Role> queryUserRoles(String userId) {
-        return roleDao.queryUserRoles(userId);
-    }
-
-    @Override
     public String login(LoginVo vo) {
+        //查询用户
         QueryWrapper<SystemUser> qr = new QueryWrapper<>();
         qr.eq("phone_number", vo.getPhone());
         SystemUser systemUser = systemUserDao.selectOne(qr);
         if (systemUser == null) {
-            throw new BusinessException(BaseResponseEnum.USER_EXIST);
+            throw new BusinessException(BaseResponseEnum.USER_NOT_EXIST);
         }
+        //密码校验
         Boolean match = PasswordUtil.match(vo.getPassword(), systemUser.getPassword());
         if (!match) {
             throw new BusinessException(BaseResponseEnum.PHONE_PASSWORD_ERROR);
         }
         //生成token
         return JwtTokenUtil.genToken(systemUser);
-    }
-
-    @Override
-    public List<MenuDto> getMenus() {
-
-        List<MenuDto> menus = new ArrayList<>();
-        //判断用户类型
-        SystemUser systemUser = systemUserDao.selectById(UserHolder.getId());
-        if (systemUser.getIsSassAdmin()) {
-            //sass管理员查询所有
-            //获取第一级菜单
-            QueryWrapper<Permission> qr = new QueryWrapper<>();
-            qr.eq("type", 1);
-            qr.isNull("pid");
-            List<Permission> list = permissionDao.selectList(qr);
-            for (Permission permission : list) {
-                MenuDto menuDto = new MenuDto();
-                //封装dto
-                BeanUtil.copyProperties(permission, menuDto);
-
-                //查询第二级
-                QueryWrapper<Permission> qrr = new QueryWrapper<>();
-                qrr.eq("type", 1);
-                qrr.eq("pid", permission.getId());
-                List<Permission> listSub = permissionDao.selectList(qrr);
-                List<MenuDto> subMenus = new ArrayList<>();
-                for (Permission permissionSub : listSub) {
-                    MenuDto menuSubDto = new MenuDto();
-                    BeanUtil.copyProperties(permissionSub, menuSubDto);
-                    subMenus.add(menuSubDto);
-                }
-                menuDto.setChildren(subMenus);
-                //添加进列表
-                menus.add(menuDto);
-
-            }
-
-        } else if (systemUser.getIsCoAdmin()) {
-            //企业管理员查询企业所有权限,同时是可见的才行
-            //获取第一级菜单
-            QueryWrapper<Permission> qr = new QueryWrapper<>();
-            qr.eq("type", 1);
-            qr.eq("en_visible", 1);
-            qr.isNull("pid");
-            List<Permission> list = permissionDao.selectList(qr);
-            for (Permission permission : list) {
-                MenuDto menuDto = new MenuDto();
-                //封装dto
-                BeanUtil.copyProperties(permission, menuDto);
-
-                //查询第二级
-                QueryWrapper<Permission> qrr = new QueryWrapper<>();
-                qrr.eq("type", 1);
-                qrr.eq("pid", permission.getId());
-                List<Permission> listSub = permissionDao.selectList(qrr);
-                List<MenuDto> subMenus = new ArrayList<>();
-                for (Permission permissionSub : listSub) {
-                    MenuDto menuSubDto = new MenuDto();
-                    BeanUtil.copyProperties(permissionSub, menuSubDto);
-                    subMenus.add(menuSubDto);
-                }
-                menuDto.setChildren(subMenus);
-                //添加进列表
-                menus.add(menuDto);
-
-            }
-        } else {
-            //普通用户更具角色查
-        }
-
-        return menus;
     }
 
     @Override
@@ -160,34 +95,28 @@ public class SystemUserServiceImpl implements SystemUserService {
     }
 
     @Override
-    public UserInfoDto userInfo(String userId) {
-        UserInfoDto userInfoDto = new UserInfoDto();
-        SystemUser systemUser = systemUserDao.selectById(userId);
-        userInfoDto.setUserInfo(systemUser);
-        //判断用户类型，如果是超级管理员查询所有权限
-        userInfoDto.setButtons(new ArrayList<>());
-        userInfoDto.setMenus(new ArrayList<>());
-
-        return userInfoDto;
-    }
-
-    @Override
     public UserInfoDto userInfo() {
         UserInfoDto userInfoDto = new UserInfoDto();
         SystemUser systemUser = systemUserDao.selectById(UserHolder.getId());
         userInfoDto.setUserInfo(systemUser);
+        List<Permission> permTree = null;
         //判断用户类型，如果是超级管理员查询所有权限
-        userInfoDto.setButtons(new ArrayList<>());
-        userInfoDto.setMenus(new ArrayList<>());
+        if (systemUser.getIsSassAdmin()) {
+            //超管拥有全部权限,只为了控制菜单，所以不查全部
+            permTree = permissionService.getPermTree(new PermCondition(false, 1));
 
+        } else if (systemUser.getIsCoAdmin()) {
+            //企业管理员获取除了超管特有的权限以外所有权限
+            permTree = permissionService.getPermTree(new PermCondition(false, 2));
+        } else {
+            //用户通过角色获取
+            permTree = permissionService.getPermTree(new PermCondition(false, 3, systemUser.getId()));
+        }
+        userInfoDto.setMenuTree(permTree);
+        //查询所有按钮权限
+        List<String> permButtons = permissionService.getPermButtons(new PermCondition(systemUser.getIsSassAdmin() ? 1 : systemUser.getIsCoAdmin() ? 2 : 3));
+        userInfoDto.setButtons(permButtons);
         return userInfoDto;
     }
-
-
-    @Override
-    public void addUser(SystemUser systemUser) {
-        systemUserDao.insert(systemUser);
-    }
-
 
 }

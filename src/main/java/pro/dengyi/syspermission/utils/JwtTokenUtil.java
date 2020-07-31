@@ -38,6 +38,9 @@ public class JwtTokenUtil {
         String token = Jwts.builder().setSubject(SUBJECT)
                 .claim("userId", systemUser.getId())
                 .claim("phoneNumber", systemUser.getPhoneNumber())
+                .claim("isSassAdmin", systemUser.getIsSassAdmin())
+                .claim("isCoAdmin", systemUser.getIsCoAdmin())
+                .claim("nickName", systemUser.getNickName())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRE))
                 .signWith(SignatureAlgorithm.HS256, APPSECRET).compact();
@@ -58,8 +61,14 @@ public class JwtTokenUtil {
                 .getBody();
         String id = (String) body.get("userId");
         String phone = (String) body.get("phoneNumber");
+        Boolean isSassAdmin = (Boolean) body.get("isSassAdmin");
+        Boolean isCoAdmin = (Boolean) body.get("isCoAdmin");
+        String nickName = (String) body.get("nickName");
         systemUser.setId(id);
         systemUser.setPhoneNumber(phone);
+        systemUser.setIsSassAdmin(isSassAdmin);
+        systemUser.setIsCoAdmin(isCoAdmin);
+        systemUser.setNickName(nickName);
         return systemUser;
 
     }

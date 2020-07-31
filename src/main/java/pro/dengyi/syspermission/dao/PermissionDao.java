@@ -11,4 +11,20 @@ public interface PermissionDao extends BaseMapper<Permission> {
 
 
     List<Permission> queryRolePerms(String roleId);
+
+    /**
+     * 根据用户ID查询所有一级权限（菜单权限集合）
+     *
+     * @param userId
+     * @return
+     */
+    List<Permission> selectFirstByUserId(String userId);
+
+    /**
+     * 根据用户ID查询所有按钮权限集合
+     *
+     * @param userId
+     * @return
+     */
+    List<Permission> selectButtonsByUserId(String userId);
 }

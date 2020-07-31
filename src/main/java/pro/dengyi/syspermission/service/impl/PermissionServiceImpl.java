@@ -7,15 +7,19 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import pro.dengyi.syspermission.common.exception.BusinessException;
-import pro.dengyi.syspermission.common.res.BaseResponseEnum;
+import pro.dengyi.syspermission.common.response.BaseResponseEnum;
 import pro.dengyi.syspermission.dao.*;
 import pro.dengyi.syspermission.model.*;
 import pro.dengyi.syspermission.model.request.PermissionPageQueryVo;
 import pro.dengyi.syspermission.model.request.PermissionRequestVo;
+import pro.dengyi.syspermission.model.vo.PermCondition;
 import pro.dengyi.syspermission.service.PermissionService;
+import pro.dengyi.syspermission.utils.UserHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -141,7 +145,14 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     @Transactional
     public void deleteById(String permissionId) {
-
+        //基础数据不能删除
+        QueryWrapper<Permission> q = new QueryWrapper<>();
+        q.eq("can_delete", false);
+        q.eq("id", permissionId);
+        Permission permissionCanDeleted = permissionDao.selectOne(q);
+        if (permissionCanDeleted != null) {
+            throw new BusinessException(BaseResponseEnum.FAIL);
+        }
         //权限被使用或者有子权限均不能删除
         QueryWrapper<RolePermission> qr = new QueryWrapper<>();
         qr.eq("permission_id", permissionId);
@@ -213,8 +224,131 @@ public class PermissionServiceImpl implements PermissionService {
         return permissionDao.selectList(qr);
     }
 
+
     @Override
-    public List<Permission> queryRolePerms(String roleId) {
-        return permissionDao.queryRolePerms(roleId);
+    public List<Permission> getPermTree() {
+        SystemUser systemUser = UserHolder.getUser();
+        List<Permission> permTree = getPermTree(new PermCondition(true, systemUser.getIsSassAdmin() ? 1 : systemUser.getIsCoAdmin() ? 2 : 3));
+        return permTree;
     }
+
+    /**
+     * 根据条件查询权限树
+     *
+     * @param condition
+     * @return
+     */
+    @Override
+    public List<Permission> getPermTree(PermCondition condition) {
+        Integer userType = condition.getUserType();
+        QueryWrapper<Permission> qr = new QueryWrapper<>();
+        List<Permission> permTree = null;
+        switch (userType) {
+            case 1:
+                //超管,查询所有
+                qr.isNull("pid");
+                permTree = permissionDao.selectList(qr);
+                break;
+            case 2:
+                //企业管理员,非系统管理员无须考虑api权限
+                qr.isNull("pid");
+                qr.eq("en_visible", true);
+                permTree = permissionDao.selectList(qr);
+                break;
+            case 3:
+                //普通用户
+                permTree = permissionDao.selectFirstByUserId(condition.getUserId());
+                break;
+            default:
+                throw new BusinessException(BaseResponseEnum.FAIL);
+        }
+        //迭代所有
+        iterateChildren(permTree, condition.isFullTree());
+
+        return permTree;
+    }
+
+    @Override
+    public List<String> getPermButtons(PermCondition condition) {
+        Integer userType = condition.getUserType();
+        QueryWrapper<Permission> qr = new QueryWrapper<>();
+        List<Permission> permList = null;
+        switch (userType) {
+            case 1:
+                //超管,查询所有
+                qr.eq("type", 2);
+                permList = permissionDao.selectList(qr);
+                break;
+            case 2:
+                //企业管理员
+                qr.eq("type", 2);
+                qr.eq("en_visible", true);
+                permList = permissionDao.selectList(qr);
+                break;
+            case 3:
+                //普通用户
+                permList = permissionDao.selectButtonsByUserId(condition.getUserId());
+                break;
+            default:
+                throw new BusinessException(BaseResponseEnum.FAIL);
+        }
+        List<String> permButtons = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(permList)) {
+            for (Permission permission : permList) {
+                permButtons.add(permission.getCode());
+            }
+        }
+        return permButtons;
+    }
+
+    @Override
+    public List<String> getRolePermIds(String roleId) {
+        List<String> permIds = new ArrayList<>();
+        QueryWrapper<RolePermission> qr = new QueryWrapper<>();
+        qr.eq("role_id", roleId);
+        List<RolePermission> rolePermissions = rolePermissionDao.selectList(qr);
+        if (!CollectionUtils.isEmpty(rolePermissions)) {
+            for (RolePermission rolePermission : rolePermissions) {
+                permIds.add(rolePermission.getPermissionId());
+            }
+        }
+        return permIds;
+    }
+
+    /**
+     * 递归迭代所有字权限
+     *
+     * @param fatherPermissionList 父权限集合
+     * @param fullTree             是否迭代完全树，true迭代菜单、按钮、权限，false只迭代菜单
+     */
+    private void iterateChildren(List<Permission> fatherPermissionList, Boolean fullTree) {
+        if (!CollectionUtils.isEmpty(fatherPermissionList)) {
+            for (Permission fatherPermission : fatherPermissionList) {
+                //查询二级
+                QueryWrapper<Permission> qrr = new QueryWrapper<>();
+                qrr.eq("pid", fatherPermission.getId());
+                List<Permission> sonPermissionList = permissionDao.selectList(qrr);
+                if (!CollectionUtils.isEmpty(sonPermissionList)) {
+                    //完全迭代
+                    if (fullTree) {
+                        fatherPermission.setChildren(sonPermissionList);
+                    }
+                    for (Permission sonPermission : sonPermissionList) {
+                        //非完全迭代只添加菜单
+                        if (sonPermission.getType() == 1) {
+                            if (!fullTree) {
+                                List<Permission> children = fatherPermission.getChildren();
+                                children.add(sonPermission);
+                                fatherPermission.setChildren(children);
+                            }
+                            //如果子权限也是菜单，那么继续递归
+                            iterateChildren(sonPermissionList, fullTree);
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
 }

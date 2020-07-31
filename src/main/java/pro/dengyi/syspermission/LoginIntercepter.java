@@ -6,7 +6,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import pro.dengyi.syspermission.common.exception.BusinessException;
-import pro.dengyi.syspermission.common.res.BaseResponseEnum;
+import pro.dengyi.syspermission.common.response.BaseResponseEnum;
 import pro.dengyi.syspermission.model.SystemUser;
 import pro.dengyi.syspermission.utils.JwtTokenUtil;
 import pro.dengyi.syspermission.utils.UserHolder;

@@ -7,19 +7,14 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import pro.dengyi.syspermission.common.res.BaseResponse;
-import pro.dengyi.syspermission.common.res.BaseResponseEnum;
-import pro.dengyi.syspermission.common.res.DataResponse;
-import pro.dengyi.syspermission.model.Role;
-import pro.dengyi.syspermission.model.SingleResponse;
+import pro.dengyi.syspermission.common.response.BaseResponse;
+import pro.dengyi.syspermission.common.response.BaseResponseEnum;
+import pro.dengyi.syspermission.common.response.DataResponse;
 import pro.dengyi.syspermission.model.SystemUser;
 import pro.dengyi.syspermission.model.request.AssignRoleRequestVo;
 import pro.dengyi.syspermission.model.request.LoginVo;
-import pro.dengyi.syspermission.model.response.MenuDto;
 import pro.dengyi.syspermission.model.response.UserInfoDto;
 import pro.dengyi.syspermission.service.SystemUserService;
-
-import java.util.List;
 
 /**
  * 用户controller
@@ -37,24 +32,20 @@ public class SystemUserController {
 
     @ApiOperation("新增用户")
     @PostMapping("/addUser")
+    @ApiImplicitParams({@ApiImplicitParam(paramType = "header", dataType = "String", name = "token", value = "token", required = true)})
     public BaseResponse addUser(@RequestBody SystemUser systemUser) {
         systemUserService.addUser(systemUser);
         return new BaseResponse(BaseResponseEnum.SUCCESS);
     }
 
-    @ApiOperation("登录")
+    @ApiOperation("登录，返回token前端其他接口header必须带token=''")
     @PostMapping("/login")
     public DataResponse<String> login(@RequestBody LoginVo vo) {
         String token = systemUserService.login(vo);
         return new DataResponse(BaseResponseEnum.SUCCESS, token);
     }
 
-    /**
-     * 查询当前用户的信息包含权限信息
-     *
-     * @return
-     */
-    @ApiOperation("查询用户信息")
+    @ApiOperation("查询用户信息,包含用户菜单树，按钮数组")
     @GetMapping("/userInfo")
     @ApiImplicitParams({@ApiImplicitParam(paramType = "header", dataType = "String", name = "token", value = "token", required = true)})
     public DataResponse<UserInfoDto> userInfo() {
@@ -63,52 +54,20 @@ public class SystemUserController {
     }
 
 
-    @ApiOperation("获取菜单")
-    @GetMapping("/getMenus")
-    public DataResponse<List<MenuDto>> getMenus() {
-        List<MenuDto> menuDtos = systemUserService.getMenus();
-        return new DataResponse(BaseResponseEnum.SUCCESS, menuDtos);
-    }
-
     @ApiOperation("用户分页查询")
     @GetMapping("/userPage/{pageNumber}/{pageSize}")
+    @ApiImplicitParams({@ApiImplicitParam(paramType = "header", dataType = "String", name = "token", value = "token", required = true)})
     public DataResponse<IPage<SystemUser>> userPage(@PathVariable Integer pageNumber, @PathVariable Integer pageSize) {
         IPage<SystemUser> pages = systemUserService.userPage(pageNumber, pageSize);
         return new DataResponse(BaseResponseEnum.SUCCESS, pages);
     }
 
-
-    /**
-     * 新增和修改都使用这一个方法
-     *
-     * @param vo 数据传输实体
-     * @return
-     */
     @ApiOperation("分配角色")
     @PostMapping("/assignRoles")
+    @ApiImplicitParams({@ApiImplicitParam(paramType = "header", dataType = "String", name = "token", value = "token", required = true)})
     public BaseResponse assignRoles(@RequestBody AssignRoleRequestVo vo) {
         systemUserService.assignRoles(vo);
         return new BaseResponse(BaseResponseEnum.SUCCESS);
-    }
-
-    /**
-     * 根据用户ID查询用户已经分配的角色
-     *
-     * @param userId 用户ID
-     * @return 角色集合
-     */
-    @ApiOperation("查询用户所有角色")
-    @GetMapping("/queryUserRoles/{userId}")
-    public SingleResponse<List<Role>> queryUserRoles(@PathVariable String userId) {
-        List<Role> list = systemUserService.queryUserRoles(userId);
-        return new SingleResponse(true, "操作成功", 200, list);
-    }
-
-    @ApiOperation("查询用户信息")
-    @GetMapping("/userInfo/{userId}")
-    public SingleResponse<UserInfoDto> userInfo(@PathVariable String userId) {
-        UserInfoDto userInfoDto = systemUserService.userInfo(userId);
-        return new SingleResponse(true, "操作成功", 200, userInfoDto);
     }
 
 

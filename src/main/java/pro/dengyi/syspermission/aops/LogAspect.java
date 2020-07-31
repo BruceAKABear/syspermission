@@ -35,7 +35,7 @@ public class LogAspect {
 
     /**
      * 通知
-     * 
+     *
      * @param joinPoint 连接点
      * @param params    响应参数
      */
@@ -82,7 +82,7 @@ public class LogAspect {
             operlog.setOpIp(null); // 请求IP
             operlog.setOpUri(request.getRequestURI()); // 请求URI
             operlog.setOpTime(new Date()); // 创建时间
-           // logOperateService.saveLogOperate(operlog);
+            // logOperateService.saveLogOperate(operlog);
         } catch (Exception e) {
             e.printStackTrace();
         }
