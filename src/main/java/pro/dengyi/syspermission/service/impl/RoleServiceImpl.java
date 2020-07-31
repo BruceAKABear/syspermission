@@ -5,15 +5,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import pro.dengyi.syspermission.common.exception.BusinessException;
+import pro.dengyi.syspermission.common.res.BaseResponseEnum;
 import pro.dengyi.syspermission.dao.RoleDao;
 import pro.dengyi.syspermission.dao.RolePermissionDao;
-import pro.dengyi.syspermission.model.request.AssignPermissionRequestVo;
+import pro.dengyi.syspermission.dao.UserRoleDao;
 import pro.dengyi.syspermission.model.Permission;
 import pro.dengyi.syspermission.model.Role;
 import pro.dengyi.syspermission.model.RolePermission;
+import pro.dengyi.syspermission.model.UserRole;
+import pro.dengyi.syspermission.model.request.AssignPermissionRequestVo;
 import pro.dengyi.syspermission.service.PermissionService;
 import pro.dengyi.syspermission.service.RoleService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,6 +30,8 @@ public class RoleServiceImpl implements RoleService {
     private RolePermissionDao rolePermissionDao;
     @Autowired
     private PermissionService permissionService;
+    @Autowired
+    private UserRoleDao userRoleDao;
 
 
     @Override
@@ -47,10 +54,31 @@ public class RoleServiceImpl implements RoleService {
         return roleDao.selectById(roleId);
     }
 
+    /**
+     * 角色删除时需要注意的问题
+     * 1. 用户绑定角色后角色不能删除
+     * 2. 角色分配权限后角色不能删除
+     *
+     * @param roleId
+     */
     @Override
     @Transactional
     public void deleteById(String roleId) {
-        roleDao.deleteById(roleId);
+        QueryWrapper<UserRole> qrr = new QueryWrapper<>();
+        qrr.eq("role_id", roleId);
+        List<UserRole> userRoles = userRoleDao.selectList(qrr);
+
+        //判断角色有没有被权限绑定
+        QueryWrapper<RolePermission> qr = new QueryWrapper<>();
+        qr.eq("role_id", roleId);
+        List<RolePermission> rolePermissions = rolePermissionDao.selectList(qr);
+        //同时为空才能删除
+        if (CollectionUtils.isEmpty(rolePermissions) && CollectionUtils.isEmpty(userRoles)) {
+            roleDao.deleteById(roleId);
+        } else {
+            throw new BusinessException(BaseResponseEnum.FAIL);
+        }
+
     }
 
     @Override
@@ -92,4 +120,19 @@ public class RoleServiceImpl implements RoleService {
     public List<Permission> queryRolePerms(String roleId) {
         return permissionService.queryRolePerms(roleId);
     }
+
+    @Override
+    public List<String> queryAssignedRoles(String userId) {
+        List<String> roles = new ArrayList<>();
+        QueryWrapper<UserRole> qr = new QueryWrapper<>();
+        qr.eq("user_id", userId);
+        List<UserRole> userRoles = userRoleDao.selectList(qr);
+        if (!CollectionUtils.isEmpty(userRoles)) {
+            for (UserRole userRole : userRoles) {
+                roles.add(userRole.getRoleId());
+            }
+        }
+        return roles;
+    }
+
 }

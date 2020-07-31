@@ -2,6 +2,8 @@ package pro.dengyi.syspermission.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -39,18 +41,35 @@ public class SystemUserController {
         systemUserService.addUser(systemUser);
         return new BaseResponse(BaseResponseEnum.SUCCESS);
     }
+
     @ApiOperation("登录")
     @PostMapping("/login")
     public DataResponse<String> login(@RequestBody LoginVo vo) {
         String token = systemUserService.login(vo);
         return new DataResponse(BaseResponseEnum.SUCCESS, token);
     }
+
+    /**
+     * 查询当前用户的信息包含权限信息
+     *
+     * @return
+     */
+    @ApiOperation("查询用户信息")
+    @GetMapping("/userInfo")
+    @ApiImplicitParams({@ApiImplicitParam(paramType = "header", dataType = "String", name = "token", value = "token", required = true)})
+    public DataResponse<UserInfoDto> userInfo() {
+        UserInfoDto userInfoDto = systemUserService.userInfo();
+        return new DataResponse(BaseResponseEnum.SUCCESS, userInfoDto);
+    }
+
+
     @ApiOperation("获取菜单")
     @GetMapping("/getMenus")
     public DataResponse<List<MenuDto>> getMenus() {
         List<MenuDto> menuDtos = systemUserService.getMenus();
         return new DataResponse(BaseResponseEnum.SUCCESS, menuDtos);
     }
+
     @ApiOperation("用户分页查询")
     @GetMapping("/userPage/{pageNumber}/{pageSize}")
     public DataResponse<IPage<SystemUser>> userPage(@PathVariable Integer pageNumber, @PathVariable Integer pageSize) {
@@ -67,7 +86,7 @@ public class SystemUserController {
      */
     @ApiOperation("分配角色")
     @PostMapping("/assignRoles")
-    public BaseResponse assignRoles(AssignRoleRequestVo vo) {
+    public BaseResponse assignRoles(@RequestBody AssignRoleRequestVo vo) {
         systemUserService.assignRoles(vo);
         return new BaseResponse(BaseResponseEnum.SUCCESS);
     }

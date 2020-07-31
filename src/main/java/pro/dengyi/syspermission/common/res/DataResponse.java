@@ -4,6 +4,8 @@ import lombok.Data;
 
 /**
  * 基础相应类
+ *
+ * @author dengy
  */
 @Data
 public class DataResponse<T> implements Response {

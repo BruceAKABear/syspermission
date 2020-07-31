@@ -172,7 +172,22 @@ public class SystemUserServiceImpl implements SystemUserService {
     }
 
     @Override
+    public UserInfoDto userInfo() {
+        UserInfoDto userInfoDto = new UserInfoDto();
+        SystemUser systemUser = systemUserDao.selectById(UserHolder.getId());
+        userInfoDto.setUserInfo(systemUser);
+        //判断用户类型，如果是超级管理员查询所有权限
+        userInfoDto.setButtons(new ArrayList<>());
+        userInfoDto.setMenus(new ArrayList<>());
+
+        return userInfoDto;
+    }
+
+
+    @Override
     public void addUser(SystemUser systemUser) {
         systemUserDao.insert(systemUser);
     }
+
+
 }

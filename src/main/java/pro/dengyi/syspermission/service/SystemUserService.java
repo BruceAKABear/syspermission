@@ -36,8 +36,8 @@ public interface SystemUserService {
      * 获取用户信息
      * 用户信息中包含1.用户个人信息2.用户菜单权限3.用户按钮权限
      *
-     * @return
      * @param userId
+     * @return
      */
     UserInfoDto userInfo(String userId);
 
@@ -47,5 +47,12 @@ public interface SystemUserService {
      * @param systemUser
      */
     void addUser(SystemUser systemUser);
+
+    /**
+     * 查询当前登录用户的用户信息
+     *
+     * @return
+     */
+    UserInfoDto userInfo();
 
 }

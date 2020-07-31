@@ -37,7 +37,6 @@ public class PermissionServiceImpl implements PermissionService {
     private RolePermissionDao rolePermissionDao;
 
 
-
     @Override
     @Transactional
     public void addPermission(PermissionRequestVo vo) {
@@ -131,17 +130,26 @@ public class PermissionServiceImpl implements PermissionService {
         return res;
     }
 
+    /**
+     * 删除权限
+     * 需要注意的问题：
+     * 1. 当权限包含子权限的时候不能删除
+     * 2. 当不包含子权限时，如果删除，需要同时将角色权限关联表中数据同时删除
+     *
+     * @param permissionId
+     */
     @Override
     @Transactional
     public void deleteById(String permissionId) {
+
         //权限被使用或者有子权限均不能删除
-        QueryWrapper<RolePermission>  qr= new QueryWrapper<>();
+        QueryWrapper<RolePermission> qr = new QueryWrapper<>();
         qr.eq("permission_id", permissionId);
         RolePermission rolePermissionMiddle = rolePermissionDao.selectOne(qr);
-        QueryWrapper<Permission> qrr= new QueryWrapper<>();
+        QueryWrapper<Permission> qrr = new QueryWrapper<>();
         qrr.eq("pid", permissionId);
         Permission permissionSelected = permissionDao.selectOne(qrr);
-        if (rolePermissionMiddle!=null||permissionSelected!=null) {
+        if (rolePermissionMiddle != null || permissionSelected != null) {
             //其中任意不为null均已被使用则不能删除
             throw new BusinessException(BaseResponseEnum.FAIL);
         }

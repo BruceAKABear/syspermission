@@ -1,9 +1,11 @@
 package pro.dengyi.syspermission.controller;
 
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pro.dengyi.syspermission.common.res.BaseResponse;
 import pro.dengyi.syspermission.common.res.BaseResponseEnum;
+import pro.dengyi.syspermission.common.res.DataResponse;
 import pro.dengyi.syspermission.model.Permission;
 import pro.dengyi.syspermission.model.Role;
 import pro.dengyi.syspermission.model.SingleResponse;
@@ -12,6 +14,7 @@ import pro.dengyi.syspermission.service.RoleService;
 
 import java.util.List;
 
+@Api(tags = "角色接口")
 @RestController
 @RequestMapping("/role")
 public class RoleController {
@@ -52,6 +55,17 @@ public class RoleController {
     public SingleResponse<List<Role>> queryAll() {
         List<Role> roles = roleService.queryAll();
         return new SingleResponse(true, "操作成功", 200, roles);
+    }
+
+    /**
+     * 查询用户已分配的角色
+     *
+     * @return
+     */
+    @GetMapping("/queryAssigned/{userId}")
+    public DataResponse<List<String>> queryAssigned(@PathVariable String userId) {
+        List<String> roles = roleService.queryAssignedRoles(userId);
+        return new DataResponse(BaseResponseEnum.SUCCESS, roles);
     }
 
 

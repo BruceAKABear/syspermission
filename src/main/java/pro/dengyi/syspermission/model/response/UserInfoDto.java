@@ -5,6 +5,11 @@ import pro.dengyi.syspermission.model.SystemUser;
 
 import java.util.List;
 
+/**
+ * 用户信息数据传输实体类
+ *
+ * @author dengy
+ */
 @Data
 public class UserInfoDto {
     /**
@@ -12,11 +17,11 @@ public class UserInfoDto {
      */
     private SystemUser userInfo;
     /**
-     * 按钮权限集合
+     * 菜单树
      */
-    private List<MenuTree> buttons;
+    private List<MenuTree> menus;
     /**
-     * 菜单权限集合
+     * 按钮集合
      */
-    private List<String> menus;
+    private List<String> buttons;
 }
