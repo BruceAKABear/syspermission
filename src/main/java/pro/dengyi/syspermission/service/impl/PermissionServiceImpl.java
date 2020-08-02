@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import pro.dengyi.syspermission.common.exception.BusinessException;
 import pro.dengyi.syspermission.common.response.BaseResponseEnum;
 import pro.dengyi.syspermission.dao.*;
@@ -188,31 +187,32 @@ public class PermissionServiceImpl implements PermissionService {
         Integer pageSize = vo.getPageSize();
         IPage<Permission> page = new Page<>(pageNumber == null ? 1 : pageNumber, pageSize == null ? 10 : pageSize);
         QueryWrapper<Permission> qr = new QueryWrapper<>();
-        //条件判断
-        if (!StringUtils.isEmpty(vo.getPid())) {
-            qr.eq("pid", vo.getPid());
-        }
-        if (vo.getEnVisible() != null) {
-            qr.eq("en_visible", vo.getEnVisible());
-        }
-        if (vo.getType() != null) {
-            switch (vo.getType()) {
-                case 0:
-                    qr.in("type", 1, 2);
-                    break;
-                case 1:
-                    qr.eq("type", 1);
-                    break;
-                case 2:
-                    qr.eq("type", 2);
-                    break;
-                case 3:
-                    qr.eq("type", 3);
-                    break;
-                default:
-                    System.out.println("参数错误");
-            }
-        }
+        qr.isNull("pid");
+//        //条件判断
+//        if (!StringUtils.isEmpty(vo.getPid())) {
+//            qr.eq("pid", vo.getPid());
+//        }
+//        if (vo.getEnVisible() != null) {
+//            qr.eq("en_visible", vo.getEnVisible());
+//        }
+//        if (vo.getType() != null) {
+//            switch (vo.getType()) {
+//                case 0:
+//                    qr.in("type", 1, 2);
+//                    break;
+//                case 1:
+//                    qr.eq("type", 1);
+//                    break;
+//                case 2:
+//                    qr.eq("type", 2);
+//                    break;
+//                case 3:
+//                    qr.eq("type", 3);
+//                    break;
+//                default:
+//                    System.out.println("参数错误");
+//            }
+//        }
         return permissionDao.selectPage(page, qr);
     }
 
@@ -313,6 +313,13 @@ public class PermissionServiceImpl implements PermissionService {
             }
         }
         return permIds;
+    }
+
+    @Override
+    public List<Permission> getChildrenByPid(String pid) {
+        QueryWrapper<Permission> qr = new QueryWrapper<>();
+        qr.eq("pid", pid);
+        return permissionDao.selectList(qr);
     }
 
     /**

@@ -50,6 +50,14 @@ public class PermissionController {
     }
 
 
+    @GetMapping("/getChildrenListByPid/{pid}")
+    @ApiOperation("根据父ID查询下一级权限列表")
+    @ApiImplicitParams({@ApiImplicitParam(paramType = "header", dataType = "String", name = "token", value = "token", required = true)})
+    public DataResponse<List<Permission>> getChildrenByPid(@PathVariable String pid) {
+        List<Permission> childrenList = permissionService.getChildrenByPid(pid);
+        return new DataResponse(BaseResponseEnum.SUCCESS, childrenList);
+    }
+
     @GetMapping("/findById/{permissionId}")
     @ApiOperation("根据ID查询权限")
     @ApiImplicitParams({@ApiImplicitParam(paramType = "header", dataType = "String", name = "token", value = "token", required = true)})
@@ -69,7 +77,7 @@ public class PermissionController {
 
 
     @GetMapping("/pageQuery")
-    @ApiOperation("权限分页查询")
+    @ApiOperation("权限分页查询,只差第一级菜单")
     @ApiImplicitParams({@ApiImplicitParam(paramType = "header", dataType = "String", name = "token", value = "token", required = true)})
     public DataResponse<IPage<Permission>> pageQuery(PermissionPageQueryVo vo) {
         IPage<Permission> pages = permissionService.pageQuery(vo);

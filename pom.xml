@@ -10,7 +10,7 @@
     </parent>
     <groupId>pro.dengyi</groupId>
     <artifactId>syspermission</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0</version>
     <name>syspermission</name>
     <description>最小权限系统测试系统</description>
 

@@ -56,4 +56,12 @@ public interface PermissionService {
      * @return
      */
     List<String> getRolePermIds(String roleId);
+
+    /**
+     * 更具父ID查询下一级权限列表
+     *
+     * @param pid 父ID
+     * @return
+     */
+    List<Permission> getChildrenByPid(String pid);
 }
