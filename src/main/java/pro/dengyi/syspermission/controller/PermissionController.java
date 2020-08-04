@@ -77,7 +77,7 @@ public class PermissionController {
 
 
     @GetMapping("/pageQuery")
-    @ApiOperation("权限分页查询,只差第一级菜单")
+    @ApiOperation("权限分页查询,只查第一级菜单")
     @ApiImplicitParams({@ApiImplicitParam(paramType = "header", dataType = "String", name = "token", value = "token", required = true)})
     public DataResponse<IPage<Permission>> pageQuery(PermissionPageQueryVo vo) {
         IPage<Permission> pages = permissionService.pageQuery(vo);

@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pro.dengyi.syspermission.dao.LogOperateDao;
-import pro.dengyi.syspermission.model.LogOperate;
+import pro.dengyi.syspermission.model.OperateLog;
 import pro.dengyi.syspermission.service.LogOperateService;
 
 @Service
@@ -15,8 +15,8 @@ public class LogOperateServiceImpl implements LogOperateService {
 
     @Override
     @Transactional
-    public void saveLogOperate(LogOperate logOperate) {
-        logOperateDao.insert(logOperate);
+    public void saveLogOperate(OperateLog operateLog) {
+        logOperateDao.insert(operateLog);
 
     }
 }
